@@ -12,8 +12,6 @@ mcswain
 # Dependency directories (if you're not using vendoring)
 vendor/
 
-# Go modules (keep these in version control)
-go.sum
 
 # IDE/editor specific files
 .idea/
