@@ -4,26 +4,26 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/johnmcswain/cli/cmd/git" // Update with your module path if needed.
 	"github.com/spf13/cobra"
 )
 
-// rootCmd represents the base command when called without any subcommands.
+// rootCmd is the base command when called without any subcommands.
 var rootCmd = &cobra.Command{
 	Use:   "mcswain",
-	Short: "mcswain is a CLI tool that bundles common git commands and more.",
-	Long: `mcswain is a command-line tool designed to streamline your workflow.
-It wraps common git commands and can be expanded to include additional functionality.`,
+	Short: "mcswain is a CLI tool that wraps common git commands and more",
+	Long:  "mcswain is a command-line tool designed to streamline your workflow with built-in wrappers for git commands like commit, pull, and push.",
 }
 
-// Execute adds all child commands to the root command and sets flags appropriately.
+func init() {
+	// Register git commands directly at the top level.
+	git.RegisterGitCommands(rootCmd)
+}
+
+// Execute executes the root command.
 func Execute() {
 	if err := rootCmd.Execute(); err != nil {
 		fmt.Println(err)
 		os.Exit(1)
 	}
-}
-
-func init() {
-	// Add the custom commit command.
-	rootCmd.AddCommand(commitCmd)
 }
