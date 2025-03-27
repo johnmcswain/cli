@@ -1,4 +1,4 @@
-module github.com/yourusername/mcswain
+module github.com/jmcswain/cli/mcswain
 
 go 1.21
 
