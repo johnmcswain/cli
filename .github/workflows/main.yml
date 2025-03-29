@@ -6,24 +6,60 @@ on:
       - 'v*'
 
 jobs:
-  build:
+  build-binaries:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        os: [linux, darwin, windows]
+        os: [linux, windows]
         arch: [amd64]
     steps:
-      - uses: actions/checkout@v3
+      - name: Checkout code
+        uses: actions/checkout@v3
+
       - name: Set up Go
         uses: actions/setup-go@v4
         with:
           go-version: '1.21'
+
+      - name: Tidy and verify dependencies
+        run: |
+          go mod tidy
+          go mod verify
+      # - name: Run tests
+      #   run: go test -v ./...
       - name: Build binary
         run: |
           GOOS=${{ matrix.os }} GOARCH=${{ matrix.arch }} go build -o build/mcswain-${{ matrix.os }}-${{ matrix.arch }}
-      - name: Upload Release Asset
+      
+      - name: Upload Release Asset (Binaries)
         uses: softprops/action-gh-release@v1
         with:
           files: build/*
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  build-macos-pkg:
+    runs-on: macos-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Go
+        uses: actions/setup-go@v4
+        with:
+          go-version: '1.21'
+
+      - name: Create build directory
+        run: mkdir -p build
+
+      - name: Build macOS pkg installer
+        run: |
+          # Use the tag name (without the leading "v" if needed) as version
+          VERSION="${GITHUB_REF##*/}"
+          ./build_pkg.sh "$VERSION"
+      
+      - name: Upload Release Asset (macOS pkg)
+        uses: softprops/action-gh-release@v1
+        with:
+          files: build/mcswain.pkg
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
